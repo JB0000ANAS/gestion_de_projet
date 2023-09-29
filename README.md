@@ -1,6 +1,14 @@
 # gestion_de_projet
 Projet en groupe
-Jebali Anas
-Hafsi Hamza
-Mellouki Rhizlane
-Amadou Aboubacar
+---
+title: "Liste des Participants"
+output: html_document
+---
+
+# Participants
+
+- Jebali Anas
+- Hafsi Hamza
+- Mellouki Rhizlane
+- Amadou Aboubacar 
+

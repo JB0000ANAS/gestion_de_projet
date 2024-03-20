@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CarChoix - Inscription</title>
     <link rel="stylesheet" href="style.css">
     <style>
-       /* Réinitialisation des styles par défaut */
-* {
+ * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -109,64 +107,62 @@ p a:hover {
     </header>
     <main>
         <?php
+        $errorMessage = ''; // Initialisation du message d'erreur
+        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Récupérez les données du formulaire
-            $nom = $_POST['n'];
-            $prenom = $_POST['p'];
-            $adresse = $_POST['adr'];
-            $email = $_POST['mail'];
-            $numero = $_POST['num'];
-            $motdepasse = $_POST['mdp1']; // Assurez-vous que mdp1 et mdp2 sont identiques
+            // Récupération des données du formulaire
+            $nom = $_POST['n'] ?? '';
+            $prenom = $_POST['p'] ?? '';
+            $adresse = $_POST['adr'] ?? '';
+            $email = $_POST['mail'] ?? '';
+            $numero = $_POST['num'] ?? '';
+            $motdepasse = $_POST['mdp1'] ?? ''; // Assurez-vous que mdp1 et mdp2 sont identiques
 
-            // Validez les données ici (par exemple, vérifiez si les champs obligatoires sont remplis)
-
-            // Connexion à la base de données
+            $motdepasse_hache = password_hash($motdepasse, PASSWORD_DEFAULT);
+             // Connexion à la base de données
             try {
-                $servername = "localhost";
-                $username = "root"; // Remplacez par votre nom d'utilisateur
-                $password = ""; // Remplacez par votre mot de passe
-                $dbname = "voiture"; // Remplacez par le nom de votre base de données
+                $pdo = new PDO('mysql:host=localhost;dbname=voiture;charset=utf8', 'root', '');
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-                // set the PDO error mode to exception
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                // prepare sql and bind parameters
-                $stmt = $conn->prepare("INSERT INTO utilisateur (nom, prenom, adresse, numero, mail, mdp) VALUES (:nom, :prenom, :adresse, :numero, :email, :motdepasse)");
+                // Préparation de la requête d'insertion
+                $stmt = $pdo->prepare("INSERT INTO utilisateur (nom, prenom, adresse, numero, mail, mdp) VALUES (:nom, :prenom, :adresse, :numero, :email, :motdepasse)");
                 $stmt->bindParam(':nom', $nom);
                 $stmt->bindParam(':prenom', $prenom);
                 $stmt->bindParam(':adresse', $adresse);
                 $stmt->bindParam(':numero', $numero);
                 $stmt->bindParam(':email', $email);
-                $stmt->bindParam(':motdepasse', $motdepasse);
+                $stmt->bindParam(':motdepasse', $motdepasse_hache);
 
-                // insert a row
+                // Exécution de la requête
                 $stmt->execute();
 
-                // Redirigez l'utilisateur vers une page de confirmation ou de remerciement
+                // Redirection après l'inscription réussie
                 header('Location: index.php');
                 exit();
             } catch(PDOException $e) {
-                // Gérez les erreurs de connexion ou d'exécution de la requête
-                echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+                if ($e->getCode() == '23000') {
+                    $errorMessage = "Le nom d'utilisateur est déjà utilisé. Veuillez en choisir un autre.";
+                } else {
+                    $errorMessage = "Erreur lors de l'enregistrement : " . $e->getMessage();
+                }
             }
         }
         ?>
         <form action="" method="post">
             <label for="nom">Nom :</label>
-            <input type="text" id="nom" name="n" value="<?php echo isset($_POST['n']) ? htmlspecialchars($_POST['n']) : ''; ?>"><br><br>
+            <input type="text" id="nom" name="n" value="<?= isset($_POST['n']) ? htmlspecialchars($_POST['n']) : ''; ?>"><br><br>
 
             <label for="prenom">Prénom :</label>
-            <input type="text" id="prenom" name="p" value="<?php echo isset($_POST['p']) ? htmlspecialchars($_POST['p']) : ''; ?>"><br><br>
+            <input type="text" id="prenom" name="p" value="<?= isset($_POST['p']) ? htmlspecialchars($_POST['p']) : ''; ?>"><br><br>
 
             <label for="adresse">Adresse :</label>
-            <input type="text" id="adresse" name="adr" value="<?php echo isset($_POST['adr']) ? htmlspecialchars($_POST['adr']) : ''; ?>"><br><br>
+            <input type="text" id="adresse" name="adr" value="<?= isset($_POST['adr']) ? htmlspecialchars($_POST['adr']) : ''; ?>"><br><br>
 
             <label for="telephone">Numéro de téléphone :</label>
-            <input type="text" id="telephone" name="num" value="<?php echo isset($_POST['num']) ? htmlspecialchars($_POST['num']) : ''; ?>"><br><br>
+            <input type="text" id="telephone" name="num" value="<?= isset($_POST['num']) ? htmlspecialchars($_POST['num']) : ''; ?>"><br><br>
 
             <label for="email">Adresse e-mail :</label>
-            <input type="text" id="email" name="mail" value="<?php echo isset($_POST['mail']) ? htmlspecialchars($_POST['mail']) : ''; ?>"><br><br>
+            <input type="text" id="email" name="mail" value="<?= isset($_POST['mail']) ? htmlspecialchars($_POST['mail']) : ''; ?>"><br><br>
 
             <label for="mdp1">Mot de passe :</label>
             <input type="password" id="mdp1" name="mdp1"><br><br>
@@ -177,6 +173,7 @@ p a:hover {
             <input type="submit" value="Enregistrer">
         </form>
         
+        <p><?= $errorMessage ?></p> <!-- Affichage du message d'erreur -->
         <p>Déjà un compte ? <a href="login.php">Connectez-vous ici</a>.</p>
     </main>
 </body>

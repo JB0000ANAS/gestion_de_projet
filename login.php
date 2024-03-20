@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Utilisateur trouvé, on tente maintenant de vérifier le mot de passe
                 if (password_verify($password, $user['mdp'])) {
                     // Le mot de passe est correct, on stocke les informations de l'utilisateur dans la session
-                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_id'] = $user['ID'];
                     $_SESSION['user_nom'] = $user['nom'];
                     $_SESSION['user_prenom'] = $user['prenom'];
                    
@@ -195,5 +195,6 @@ p a:hover {
     </main>
 </body>
 </html>
+
 
 

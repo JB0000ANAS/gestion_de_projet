@@ -1,5 +1,5 @@
 <?php
-session_start(); // Assurez-vous de démarrer la session au début du script
+session_start(); // Démarre la session
 
 // Configuration de la base de données
 $servername = "localhost";
@@ -11,20 +11,20 @@ $dbname = "voiture";
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     die("Erreur de connexion : " . $e->getMessage());
 }
 
-// Vérification de la méthode de requête et de la connexion
+$errorMessage = ""; // Initialisation de $errorMessage
+$successMessage = ""; // Initialisation de $successMessage
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Validation des entrées
     if (empty($username) || empty($password)) {
-        $errorMessage = "Veuillez remplir tous les champs.";
+        $errorMessage = "L'adresse e-mail et le mot de passe sont obligatoires.";
     } else {
-        // Recherche de l'utilisateur dans la base de données
         try {
             $stmt = $conn->prepare("SELECT * FROM utilisateur WHERE mail = :username");
             $stmt->bindParam(':username', $username);
@@ -32,20 +32,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Vérification du mot de passe
-            if ($user && password_verify($password, $user['mdp'])) {
-                // Connexion réussie, redirection vers index.php
-                $_SESSION['user'] = $user; // Définition des variables de session
-                header('Location: index.php');
-                exit();
+            if ($user) {
+                // Utilisateur trouvé, on tente maintenant de vérifier le mot de passe
+                if (password_verify($password, $user['mdp'])) {
+                    // Le mot de passe est correct, on stocke les informations de l'utilisateur dans la session
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_nom'] = $user['nom'];
+                    $_SESSION['user_prenom'] = $user['prenom'];
+                   
+                    // Redirection vers la page d'accueil après connexion réussie
+                    header('Location: index.php');
+                    exit();
+                } else {
+                    // Le mot de passe ne correspond pas
+                    $errorMessage = "Le mot de passe est incorrect.";
+                }
             } else {
-                $errorMessage = "Identifiants incorrects.";
+                // Utilisateur non trouvé
+                $errorMessage = "Aucun utilisateur trouvé avec cette adresse e-mail.";
             }
-        } catch(PDOException $e) {
-            $errorMessage = "Une erreur est survenue lors de la vérification de l'utilisateur.";
+        } catch (PDOException $e) {
+            $errorMessage = "Erreur lors de la connexion : " . $e->getMessage();
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -143,6 +154,13 @@ p a:hover {
     text-decoration: underline;
 }
 
+.user-info {
+    text-align: right;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+}
+
     </style>
 </head>
 <body>
@@ -155,10 +173,16 @@ p a:hover {
                 <li><a href="contact.php">Nous contacter</a></li>
             </ul>
         </nav>
+        <?php if(isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])): ?>
+            <div class="user-info">Bonjour <?php echo $_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom']; ?> | <a href="logout.php">Déconnexion</a></div>
+        <?php 
+    endif; ?>
     </header>
     <main>
-        <?php if (isset($errorMessage)): ?>
+        <?php if ($errorMessage): ?>
             <p class="error"><?php echo htmlspecialchars($errorMessage); ?></p>
+        <?php elseif ($successMessage): ?>
+            <p class="success"><?php echo htmlspecialchars($successMessage); ?></p>
         <?php endif; ?>
         <form action="" method="post">
             <label for="username">Adresse e-mail :</label>
@@ -171,4 +195,5 @@ p a:hover {
     </main>
 </body>
 </html>
+
 

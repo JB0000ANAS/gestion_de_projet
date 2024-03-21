@@ -174,7 +174,7 @@ p a:hover {
             </ul>
         </nav>
         <?php if(isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])): ?>
-            <div class="user-info">Bonjour <?php echo $_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom']; ?> | <a href="logout.php">Déconnexion</a></div>
+            <div class="user-info">Bonjour <?php echo $_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom']; ?> | </div>
         <?php 
     endif; ?>
     </header>

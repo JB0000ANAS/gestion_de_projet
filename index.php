@@ -28,7 +28,7 @@ if (isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])) {
     <p>BIENVENUE CHEZ CarChoix !</p>
     <nav>
   <ul>
-  <li><a href="profile.php">Modifier mon profil</a></li>
+  <li><a href="profile.php">Mon profil</a></li>
     <li><a href="contact.php">Nous contacter</a></li>
     <li class="user-info">
       <span class="initials"><?php echo strtoupper($prenom[0]) . strtoupper($nom[0]); ?></span>

@@ -27,12 +27,16 @@ if (isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])) {
     </div>
     <p>BIENVENUE CHEZ CarChoix !</p>
     <nav>
-      <ul>
-        <li><a href="index.php">Accueil</a></li>
-        <li><div class="user-info">Bonjour <?php echo $prenom . ' ' . $nom; ?> | <a href="Deconnexion.php">Déconnexion</a></div></li>
-        <li><a href="contact.php">Nous contacter</a></li>
-      </ul>
-    </nav>
+  <ul>
+  <li><a href="profile.php">Modifier mon profil</a></li>
+    <li><a href="contact.php">Nous contacter</a></li>
+    <li class="user-info">
+      <span class="initials"><?php echo strtoupper($prenom[0]) . strtoupper($nom[0]); ?></span>
+      <span class="name"><?php echo $prenom; ?></span>
+      <a href="Deconnexion.php">Déconnexion</a>
+    </li>
+  </ul>
+</nav>
   </header>
   <main>
     <section class="hero">
@@ -42,12 +46,15 @@ if (isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])) {
       <a href="recherche.php" class="button">Recherche de voiture</a>
     </section>
     <section class="about">
-      <h2>Qui sommes-nous ?</h2>
-      <p>Nous sommes une équipe passionnée par l'automobile, dévouée à vous fournir les meilleurs conseils pour votre prochaine véhicule.</p>
-    </section>
+    <a href="aproposdenous.php" style="text-decoration: none; color: inherit;">
+    <h2>Qui sommes-nous ?</h2>
+  </a>
+  <p>Nous sommes une équipe passionnée par l'automobile, dévouée à vous fournir les meilleurs conseils pour votre prochaine véhicule.</p>
+</section>
   </main>
   <footer>
     <p>&copy; 2024 CarChoix</p>
   </footer>
 </body>
 </html>
+

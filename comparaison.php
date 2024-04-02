@@ -111,7 +111,8 @@ button[type="submit"]:hover {
     $stmt = $pdo->query("SELECT id, nom_modele FROM vehicules");
     $vehicules = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
-       <select id="vehicle1" name="vehicle1">
+    <form id="comparison-form" action="resultat_comparaison.php" method="post">
+      <select id="vehicle1" name="vehicle1">
         <option value="">Sélectionner un véhicule</option>
         <?php foreach ($vehicules as $vehicule): ?>
           <option value="<?= $vehicule['id'] ?>"><?= $vehicule['nom_modele'] ?></option>
@@ -142,4 +143,5 @@ button[type="submit"]:hover {
 
 </body>
 </html>
+
 

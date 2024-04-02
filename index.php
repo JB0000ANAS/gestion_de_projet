@@ -44,6 +44,8 @@ if (isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])) {
       <p>Sur CarChoix, nous vous aidons à trouver la voiture parfaite pour vos besoins.</p>
       <p>Que vous recherchiez une voiture économique, sportive ou familiale, nous avons ce qu'il vous faut !</p>
       <a href="recherche.php" class="button">Recherche de voiture</a>
+      <a href="comparaison.php" class="button">Comparer</a>
+
     </section>
     <section class="about">
     <a href="aproposdenous.php" style="text-decoration: none; color: inherit;">
@@ -57,4 +59,5 @@ if (isset($_SESSION['user_nom']) && isset($_SESSION['user_prenom'])) {
   </footer>
 </body>
 </html>
+
 

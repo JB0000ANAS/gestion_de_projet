@@ -1,6 +1,6 @@
 <?php
 // Connexion à la base de données MySQL
-$pdo = new PDO('mysql:host=localhost;dbname=voiture;charset=utf8', 'root', 'root');
+$pdo = new PDO('mysql:host=localhost;dbname=voiture;charset=utf8', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Récupération des résultats de la recherche depuis le formulaire de recherche
@@ -30,6 +30,7 @@ $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résultats de la recherche</title>
     <link rel="stylesheet" href="style_resultat.css">
+    
 </head>
 <body>
     <header>
@@ -65,8 +66,7 @@ $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li><strong>Capacité de la batterie:</strong> <?= $resultat['capacite_de_la_batterie'] ?></li>
                     <li><strong>Prix:</strong> <?= $resultat['prix'] ?></li>
                 </ul>
-                <a href="comparaison.php?id=<?= $resultat['id'] ?>" class="compare-button">Comparer avec un autre véhicule</a>
-
+ 
 
                 
             </div>

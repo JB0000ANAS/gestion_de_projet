@@ -1,10 +1,22 @@
 <?php
 session_start();
 
-// Initialiser les valeurs des véhicules sélectionnés et des critères de comparaison
-$vehicle1 = isset($_SESSION['vehicle1']) ? $_SESSION['vehicle1'] : null;
-$vehicle2 = isset($_SESSION['vehicle2']) ? $_SESSION['vehicle2'] : null;
-$criteria = isset($_SESSION['criteria']) ? $_SESSION['criteria'] : [];
+// Vérifier si le formulaire a été soumis
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Récupérer les identifiants des véhicules et les critères sélectionnés
+    $vehicle1 = isset($_POST['vehicle1']) ? $_POST['vehicle1'] : null;
+    $vehicle2 = isset($_POST['vehicle2']) ? $_POST['vehicle2'] : null;
+    $criteria = isset($_POST['criteria']) ? $_POST['criteria'] : [];
+
+    // Stocker les données des véhicules en session
+    $_SESSION['vehicle1'] = $vehicle1;
+    $_SESSION['vehicle2'] = $vehicle2;
+    $_SESSION['criteria'] = $criteria;
+
+    // Redirection vers la même page pour afficher les résultats
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
 
 // Connexion à la base de données
 try {
@@ -14,26 +26,27 @@ try {
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
 
-// Fonction pour récupérer les données d'un véhicule
-function getVehicleData($pdo, $vehicleId)
-{
-    $stmt = $pdo->prepare("SELECT * FROM vehicules WHERE id = ?");
-    $stmt->execute([$vehicleId]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
+// Initialiser les données des véhicules à vide
+$vehicle1Data = $vehicle2Data = $comparisonData = [];
 
-// Récupérer les données des véhicules
-$vehicle1Data = $vehicle1 ? getVehicleData($pdo, $vehicle1) : [];
-$vehicle2Data = $vehicle2 ? getVehicleData($pdo, $vehicle2) : [];
+// Vérifier si les véhicules sont sélectionnés
+if (isset($_SESSION['vehicle1'], $_SESSION['vehicle2'])) {
+    // Préparer et exécuter les requêtes pour récupérer les données des véhicules
+    $stmt1 = $pdo->prepare("SELECT * FROM vehicules WHERE id = ?");
+    $stmt2 = $pdo->prepare("SELECT * FROM vehicules WHERE id = ?");
+    $stmt1->execute([$_SESSION['vehicle1']]);
+    $stmt2->execute([$_SESSION['vehicle2']]);
+    $vehicle1Data = $stmt1->fetch(PDO::FETCH_ASSOC);
+    $vehicle2Data = $stmt2->fetch(PDO::FETCH_ASSOC);
 
-// Préparation des données pour le graphique
-$comparisonData = [];
-if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
-    foreach ($criteria as $criterion) {
-        $comparisonData[$criterion] = [
-            'vehicule1' => $vehicle1Data[$criterion],
-            'vehicule2' => $vehicle2Data[$criterion],
-        ];
+    // Préparation des données pour le graphique si les véhicules sont trouvés
+    if ($vehicle1Data && $vehicle2Data) {
+        foreach ($_SESSION['criteria'] as $criterion) {
+            $comparisonData[$criterion] = [
+                'vehicule1' => $vehicle1Data[$criterion],
+                'vehicule2' => $vehicle2Data[$criterion],
+            ];
+        }
     }
 }
 ?>
@@ -46,7 +59,99 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
     <title>Comparaison de véhicules</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        
         /* Styles CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        header {
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .selection {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 10px;
+        }
+
+        .comparison {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            color: #000;
+        }
+
+        #chartContainer {
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
@@ -73,8 +178,7 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
             <?php
             $stmt = $pdo->query("SELECT id, nom_modele FROM vehicules");
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $selected = ($row['id'] == $vehicle1) ? 'selected' : '';
-                echo '<option value="' . $row['id'] . '" ' . $selected . '>' . $row['nom_modele'] . '</option>';
+                echo '<option value="' . $row['id'] . '">' . $row['nom_modele'] . '</option>';
             }
             ?>
         </select>
@@ -84,31 +188,28 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
             <?php
             $stmt->execute();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $selected = ($row['id'] == $vehicle2) ? 'selected' : '';
-                echo '<option value="' . $row['id'] . '" ' . $selected . '>' . $row['nom_modele'] . '</option>';
+                echo '<option value="' . $row['id'] . '">' . $row['nom_modele'] . '</option>';
             }
             ?>
         </select>
 
         <div id="criteria">
-            <h2>Sélectionner le critère de comparaison :</h2>
-            <select id="comparison-criteria" name="criteria">
-                <option value="">Sélectionner un critère</option>
-                <option value="prix" <?php if (in_array('prix', $criteria)) echo 'selected'; ?>>Prix</option>
-                <option value="capacite_de_la_batterie" <?php if (in_array('capacite_de_la_batterie', $criteria)) echo 'selected'; ?>>Capacité de la batterie</option>
-                <option value="autonomie_electrique" <?php if (in_array('autonomie_electrique', $criteria)) echo 'selected'; ?>>Autonomie électrique</option>
-                <option value="acceleration" <?php if (in_array('acceleration', $criteria)) echo 'selected'; ?>>Accélération</option>
-                <option value="vitesse_maximale" <?php if (in_array('vitesse_maximale', $criteria)) echo 'selected'; ?>>Vitesse maximale</option>
-                <option value="nombre_de_cylindres" <?php if (in_array('nombre_de_cylindres', $criteria)) echo 'selected'; ?>>Nombre de cylindres</option>
-                <option value="couple_maximal" <?php if (in_array('couple_maximal', $criteria)) echo 'selected'; ?>>Couple maximal</option>
-                <option value="puissance_du_moteur" <?php if (in_array('puissance_du_moteur', $criteria)) echo 'selected'; ?>>Puissance moteur</option>
-            </select>
+            <h2>Sélectionner les critères de comparaison :</h2>
+            <label><input type="checkbox" name="criteria[]" value="prix"> Prix</label>
+            <label><input type="checkbox" name="criteria[]" value="capacite_de_la_batterie"> Capacité de la batterie</label>
+            <label><input type="checkbox" name="criteria[]" value="autonomie_electrique"> Autonomie électrique</label>
+            <label><input type="checkbox" name="criteria[]" value="acceleration"> Accélération</label>
+            <label><input type="checkbox" name="criteria[]" value="vitesse_maximale"> Vitesse maximale</label>
+            <label><input type="checkbox" name="criteria[]" value="nombre_de_cylindres"> Nombre de cylindres</label>
+            <label><input type="checkbox" name="criteria[]" value="couple_maximal"> Couple maximal</label>
+            <label><input type="checkbox" name="criteria[]" value="puissance_du_moteur"> Puissance moteur</label>
         </div>
+        <button type="submit">Comparer</button>
     </form>
 </div>
 
-<div class="comparison">
-    <?php if (!empty($comparisonData)) : ?>
+<?php if ($comparisonData): ?>
+    <div class="comparison">
         <h2>Résultats de la comparaison :</h2>
 
         <table>
@@ -120,7 +221,7 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($comparisonData as $criterion => $data) : ?>
+            <?php foreach ($comparisonData as $criterion => $data): ?>
                 <tr>
                     <td><?= htmlspecialchars(ucfirst($criterion)) ?></td>
                     <td><?= htmlspecialchars($data['vehicule1']) ?></td>
@@ -135,10 +236,6 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
         </div>
 
         <script>
-            document.getElementById('comparison-criteria').addEventListener('change', function () {
-                this.form.submit();
-            });
-
             const jsonData = <?= json_encode($comparisonData); ?>;
             const ctx = document.getElementById('myChart').getContext('2d');
             const myChart = new Chart(ctx, {
@@ -168,8 +265,8 @@ if (!empty($criteria) && $vehicle1Data && $vehicle2Data) {
                 }
             });
         </script>
-    <?php endif; ?>
-</div>
+    </div>
+<?php endif; ?>
 
 </body>
 </html>

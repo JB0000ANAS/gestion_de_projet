@@ -1,4 +1,3 @@
-Voici le code modifié avec des vérifications supplémentaires pour éviter les sorties indésirables avant la redirection :
 <?php
 session_start(); // Cette fonction doit être la première instruction pour travailler correctement avec les sessions.
 

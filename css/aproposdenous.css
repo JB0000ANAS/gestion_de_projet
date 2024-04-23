@@ -1,0 +1,89 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* Lighter background for the whole page */
+    color: #333;
+    line-height: 1.8; /* Improved line height */
+}
+
+header {
+    background-color: #222; /* Darker shade for better contrast */
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.logo img {
+    height: 70px;
+}
+
+header h2 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px; /* Added padding around the main content */
+    background-color: #ffffff; /* White background for main content */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Subtle shadow around main content */
+}
+
+h1 {
+    text-align: center;
+    font-size: 60px;
+    margin-bottom: 30px; /* More space below the header */
+}
+
+.titre2, .texte1, .texte2, .texte3 {
+    font-size: 16px;
+    text-align: justify;
+    padding: 10px; /* Padding inside text containers */
+    background-color: #f9f9f9; /* Very light background for paragraphs */
+    margin-bottom: 20px;
+    border-radius: 5px; /* Rounded corners for paragraphs */
+}
+
+.image1, .image2 {
+    max-width: 100%; /* Corrected max-width */
+    height: auto;
+    display: block; /* Ensures it is centered */
+    margin: 10px auto; /* Margin correction for centering */
+    border-radius: 5px;
+}
+
+footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+footer ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+footer ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+footer ul li:last-child {
+    margin-right: 0;
+}
+
+footer a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}

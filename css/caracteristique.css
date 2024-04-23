@@ -1,0 +1,124 @@
+* caracteristique.css */
+
+/* Add a class to style the centered content */
+.centered-content {
+    margin-top: 4rem; /* Adjust the value as needed */
+  }
+  
+  /* Base styles */
+  body {
+    background-color: #c31212;
+  }
+   h1, h2, button, p {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Header styles */
+  .header {
+    border-bottom: 1px solid #a0a2a4;
+  }
+  
+  .navbar {
+    @apply flex justify-between items-center py-4 px-8;
+  }
+  
+  .navbar a {
+    @apply text-gray-700 hover:text-gray-900;
+  }
+  
+  .navbar .logo {
+    @apply font-bold text-xl;
+  }
+  
+  /* Main content area */
+  .main-content {
+    @apply flex flex-col justify-center min-h-screen py-12;
+  }
+  
+  /* Car details and buttons */
+  .car-details {
+    @apply flex flex-col md:flex-row items-center justify-around;
+  }
+  
+  .car-image {
+    @apply w-full md:w-1/2 max-w-lg mx-auto;
+  }
+  
+  .buttons-container {
+    @apply flex flex-col md:flex-row justify-center items-center mt-4 md:mt-0;
+  }
+  
+  .button {
+    @apply py-2 px-6 mt-2 md:mt-0 md:ml-2 border rounded text-sm font-semibold cursor-pointer;
+    background-color: #f3f4f6; /* Light gray background */
+  }
+  
+  .button:hover {
+    background-color: #e5e7eb; /* Darker gray on hover */
+  }
+  
+  /* Pricing and technical specs */
+  .price-info {
+    @apply text-lg font-bold mt-4;
+  }
+  
+  .tech-specs {
+    @apply bg-white p-8 shadow rounded-lg mt-8 mx-auto text-center;
+    max-width: 60rem;
+  }
+  
+  .tech-specs-header {
+    @apply text-xl font-bold mb-6;
+  }
+  
+  .tech-details {
+    @apply flex flex-col md:flex-row justify-between md:text-left text-center;
+  }
+  
+  .tech-detail {
+    @apply mb-4 md:mb-0;
+  }
+  
+  /* Responsive design */
+  @media (min-width: 768px) {
+    .buttons-container {
+      @apply flex-row;
+    }
+  
+    .tech-details {
+      @apply grid grid-cols-2 gap-8;
+    }
+  }
+  
+  /* Custom styling for additional specificity if needed */
+  .custom-title {
+    @apply text-2xl font-semibold my-2;
+  }
+  
+  .custom-subtitle {
+    @apply text-xl my-1;
+  }
+  
+  .custom-text {
+    @apply my-1;
+  }
+  
+  .custom-button {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+  
+  .custom-section {
+    @apply py-4;
+  }
+  
+  /* Media queries for responsiveness */
+  @media (max-width: 640px) {
+    .car-details, .tech-details {
+      @apply flex-col;
+    }
+  }
+  
+  /* Centering the main container */
+  .main-container {
+    @apply flex flex-col justify-center items-center;
+  }

@@ -1,0 +1,104 @@
+/* Styles CSS */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #d6d7d7; /* Lighter background for a modern look */
+    color: #d6d6d6;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #2c3e50; /* Dark blue for a sharper contrast */
+}
+
+.selection, .comparison {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Spacing between form elements */
+}
+
+select {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc; /* Subtle border for inputs */
+    background-color: #fafafa; /* Light background for inputs */
+    font-size: 16px;
+    box-sizing: border-box; /* Better box sizing model */
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between checkbox and label text */
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    accent-color: #3498db; /* Custom color for checkboxes */
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #3498db; /* Button color */
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Transition for button hover */
+}
+
+button:hover {
+    background-color: #2980b9; /* Darker shade on hover */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #3498db; /* Header background */
+    color: white;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; /* Zebra striping for rows */
+}
+
+#chartContainer {
+    width: 100%;
+    margin-top: 30px;
+    text-align: center; /* Center the chart canvas */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .selection, .comparison {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    select, button {
+        font-size: 14px;
+    }
+}

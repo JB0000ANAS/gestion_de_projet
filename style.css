@@ -1,0 +1,723 @@
+/* Custom styles for CarChoix website */
+
+/* Reset padding and margins for all elements */
+
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Style the body with a default font, likely provided by Tailwind */
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+
+/* Base styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Navbar Styles */
+nav.bg-black {
+    background-color: #000; /* Black background for navbar */
+    height: 100px; /* Fixed height for navbar */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Spacing out logo and nav items */
+    padding: 0 20px; /* Padding on the sides */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+nav h1, nav a {
+    color: #fff; /* White text for visibility */
+    text-decoration: none; /* No underline for links */
+    margin-left: 20px; /* Spacing between nav items */
+}
+
+nav h1:hover, nav a:hover {
+    color: #ff0000; /* Red for hover state */
+}
+
+/* Logo Styles */
+nav img {
+    height: 80px; /* Logo size */
+}
+
+/* Search Bar Container */
+.search-container {
+    position: relative; /* Relative position for absolute positioning of children */
+}
+
+/* Search Input Styles */
+nav input[type="search"] {
+    padding: 10px;
+    border-radius: 20px;
+    border: 2px solid #fff; /* White border for visibility */
+    width: 300px; /* Wider search bar */
+}
+
+/* Search Button Styles */
+nav button.search-button {
+    position: absolute; /* Absolute position relative to search-container */
+    right: 5px;
+    top: 5px;
+    background-color: #ff0000; /* Red background for search button */
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+nav button.search-button:hover {
+    background-color: #e60000; /* Darker shade of red for hover state */
+}
+
+/* Responsive Design for Mobile View */
+@media screen and (max-width: 768px) {
+    nav.bg-black {
+        height: auto; /* Auto height for smaller screens */
+        flex-direction: column; /* Stack items vertically */
+        padding: 10px; /* Less padding */
+    }
+
+    nav a {
+        margin-left: 0; /* Align links */
+    }
+
+    nav .search-container {
+        order: -1; /* Bring search bar to the top on mobile */
+        width: 100%; /* Full width search bar */
+        margin-bottom: 10px; /* Space below search bar */
+    }
+
+    nav input[type="search"] {
+        width: calc(100% - 20px); /* Full width minus padding */
+    }
+
+    nav button.search-button {
+        top: 50%;
+        transform: translateY(-50%); /* Center vertically */
+    }
+}
+
+/* Fix navbar at the top */
+.fixed {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+/* Z-index utility class */
+.z-50 {
+    z-index: 50;
+}
+
+/* Hover State Styles */
+.hover\:text-red-600:hover {
+    color: #ff0000;
+}
+
+/* Background color utility classes */
+.bg-red-600 {
+    background-color: #ff0000; /* Primary red color */
+}
+
+.hover\:bg-red-500:hover {
+    background-color: #e60000; /* Red hover state */
+}
+
+/* Utility Classes for Padding and Margin */
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.mr-4 {
+    margin-right: 1rem;
+}
+
+/* Responsive Navbar Toggle */
+#mobileMenuBtn {
+    display: none; /* Hidden by default */
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+/* Show mobile menu toggle button on smaller screens */
+@media (max-width: 640px) {
+    #mobileMenuBtn {
+        display: block;
+    }
+}
+
+/* General Styling for Signup and Login Buttons */
+button.signup, button.login {
+    background-color: #ff0000; /* Primary red color */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button.signup:hover, button.login:hover {
+    background-color: #e60000; /* Darker red on hover */
+}
+
+/* Modal Styles */
+.modal {
+  display: none; /* Default state is hidden */
+  /* Other modal styles would go here */
+}
+
+/* Additional Utility Classes */
+.hidden {
+  display: none; /* Helper class to quickly hide elements */
+}
+
+/* Class for items within the navbar that should be flex containers */
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+/* Class to add padding for items within the navbar */
+.px-4, .md\:px-12 {
+  padding-left: 1rem; /* 16px */
+  padding-right: 1rem; /* 16px */
+}
+
+.md\:px-12 {
+  padding-left: 3rem; /* 48px */
+  padding-right: 3rem; /* 48px */
+}
+
+/* Spacing utility classes */
+.mr-4 {
+  margin-right: 1rem; /* 16px */
+}
+
+/* Height utility class for logo */
+.h-16 {
+  height: 4rem; /* 64px */
+}
+
+/* Responsive Navbar: Adjust navbar height on small screens */
+@media screen and (max-width: 640px) {
+  nav.bg-black {
+    height: 150px; /* Increased height */
+  }
+}
+
+/* Fix navbar at the top */
+.fixed {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/* Z-index utility class */
+.z-50 {
+  z-index: 50;
+}
+
+/* Text color utility classes */
+.text-white {
+  color: #ffffff;
+}
+
+.hover\:text-red-600:hover {
+  color: #ff0000;
+}
+
+/* Background color utility classes */
+.bg-blue-600 {
+  background-color: #e60000;
+}
+
+.hover\:bg-blue-500:hover {
+  background-color: #3333ff;
+}
+
+.bg-green-600 {
+  background-color: #e60000;
+}
+
+.hover\:bg-green-500:hover {
+  background-color: #e60000;
+}
+
+/* Border radius utility class */
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* Shadow utility class */
+.shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+
+/* Hero section styles */
+.hero {
+    background-image: url('path-to-hero-image.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 4rem 0;
+}
+
+/* Styles for the featured news article over the hero image */
+.featured-news {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    padding: 2rem;
+    color: #ffffff;
+    margin-top: -4rem; /* Adjust based on actual positioning */
+    width: 50%; /* Adjust width as needed */
+}
+
+/* Top-rated cars carousel styles */
+.top-rated-cars {
+    margin-top: 4rem; /* Add space above the carousel */
+}
+
+/* Individual car card styles within the carousel */
+.car-card {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-right: 1rem;
+    width: 16rem; /* Adjust width as needed */
+}
+
+/* Categories section styles */
+.categories {
+    padding: 4rem 0;
+}
+
+/* Individual category styles */
+.category-item {
+    margin: 1rem;
+    width: calc(20% - 2rem); /* Adjust width for 5 items per row */
+}
+
+/* Footer styles */
+.footer {
+    padding: 2rem 0;
+    background-color: #1a202c; /* Tailwind gray-900 */
+    color: #ffffff;
+}
+
+/* Specific link styles within the footer */
+.footer-links a {
+    color: #9ca3af; /* Tailwind gray-400 */
+    margin-bottom: 0.5rem;
+    display: block; /* Stack links vertically */
+}
+/* Category Card Styles */
+/* Category Card Image Styles */
+.category-card img {
+  display: block;
+  width: 200px; /* Set width to 200px */
+  height: 500px; /* Set height to 500px */
+  object-fit: cover; /* Ensures the image covers the card area */
+  border-top-left-radius: 8px; /* Rounded corners */
+  border-top-right-radius: 8px;
+}
+
+/* Category Card Title Styles */
+.category-card h3 {
+  position: absolute;
+  bottom: 0; /* Align title to bottom */
+  left: 0;
+  width: 200px; /* Set title width to match the image */
+  background-color: rgba(255,255,255,0.85); /* Semi-transparent background */
+  text-align: center;
+  padding: 0.5rem 0; /* Padding for the title */
+  font-size: 1.25rem; /* Title font size */
+  font-weight: bold;
+  border-bottom-left-radius: 8px; /* Rounded corners */
+  border-bottom-right-radius: 8px;
+}
+
+/* Category Container Styles */
+.categories-container {
+  display: flex;
+  justify-content: space-around; /* Space out category cards evenly */
+  flex-wrap: wrap; /* Allow wrapping for responsiveness */
+  gap: 1rem; /* Space between cards */
+}
+
+/* Additional styles for the category card itself */
+.category-card {
+  position: relative; /* Set to relative to position the title absolutely relative to the card */
+  overflow: hidden; /* Hide overflow to maintain the clean look of border-radius */
+  border-radius: 8px; /* Apply rounded corners to the entire card */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Slight shadow for depth */
+  margin-bottom: 1rem; /* Margin at the bottom for spacing between rows */
+}
+
+@media (max-width: 768px) {
+  .category-card {
+    width: 200px; /* Set width to 200px for all viewport sizes */
+  }
+  .category-card h3 {
+    width: 200px; /* Ensure title width matches the image for all viewport sizes */
+  }
+}
+
+@media (max-width: 640px) {
+  .categories-container {
+    justify-content: center; /* Center cards on small screens */
+  }
+}
+
+
+
+
+/* Modal backdrop styles */
+/* Global modal styles */
+.modal {
+  display: none; /* Hidden by default to be toggled by JS */
+  position: fixed; /* Fixed position to stay in viewport */
+  z-index: 1000; /* High z-index to stay above other elements */
+  left: 0; top: 0; /* Positioned at the top left corner */
+  width: 100%; height: 100%; /* Full width and height to cover screen */
+  overflow: auto; /* Scroll inside modal if content is too long */
+  background-color: rgba(0,0,0,0.6); /* Dark semi-transparent background */
+  padding-top: 60px; /* Padding from the top */
+}
+
+/* Modal inner content styles */
+.modal-content {
+  background-color: #fff; /* White background */
+  margin: 5% auto; /* Centered with margin from the top */
+  padding: 40px; /* Spacious padding for content */
+  border: 1px solid #888; /* Subtle border */
+  width: 40%; /* Adaptive width */
+  border-radius: 12px; /* Rounded corners for aesthetics */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Box shadow for depth */
+}
+
+/* Close button styles */
+.close {
+  color: #aaa; /* Light grey color for the close icon */
+  float: right; /* Positioned to the right */
+  font-size: 35px; /* Larger font size for better clickability */
+  font-weight: bold; /* Bold weight for visibility */
+}
+
+/* Hover and focus styles for the close button */
+.close:hover, .close:focus {
+  color: #f44336; /* Red color for interactivity */
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Tab link styles */
+.tablink {
+  background-color: #f44336; /* Red background for tabs */
+  color: white; /* White text for contrast */
+  float: left;
+  border: none; /* No border for a clean look */
+  outline: none; /* No outline on focus for a clean style */
+  cursor: pointer; /* Pointer to indicate clickable */
+  padding: 16px 20px; /* Comfortable padding for tab buttons */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+  font-size: 18px; /* Readable font size */
+}
+
+/* Hover style for tab links */
+.tablink:hover {
+  background-color: #d32f2f; /* Slightly darker red on hover */
+}
+
+/* Active tab link styles */
+.active, .tablink.active {
+  background-color: #b71c1c; /* Even darker red for active state */
+  color: white; /* Keep text white for readability */
+}
+
+/* Tab content styles */
+.tabcontent {
+  display: none; /* Hidden by default to be toggled by JS */
+  padding: 20px; /* Padding for content */
+  border: none; /* No border for a cleaner look */
+  animation: fadeEffect 1s; /* Fade effect for transition */
+}
+
+/* Animation keyframes for the fade effect */
+@-webkit-keyframes fadeEffect {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeEffect {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Input field styles */
+.form-input {
+  margin-bottom: 1.5rem; /* Spacing between inputs */
+  border: 2px solid #f44336; /* Red border to match theme */
+  border-radius: 0.5rem; /* Rounded edges for inputs */
+  padding: 0.75rem 1rem; /* Comfortable padding inside inputs */
+  width: calc(100% - 2rem); /* Full width taking padding into account */
+}
+
+/* Label styles for better visibility */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555; /* Darker label color for better readability */
+  font-weight: 600; /* Semi-bold for emphasis */
+}
+
+/* Styles for form buttons */
+button {
+  background-color: #f44336; /* Red background to match theme */
+  color: white; /* White text for contrast */
+  text-align: center;
+  padding: 0.75rem 1.5rem; /* Spacious padding for buttons */
+  border: none; /* No border for a seamless look */
+  border-radius: 0.5rem; /* Rounded edges for buttons */
+  cursor: pointer; /* Pointer to indicate clickable */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+/* Button hover effect */
+button:hover {
+  background-color: #d32f2f; /* Slightly darker red on hover */
+}
+
+/* Responsive modal content */
+@media (max-width: 640px) {
+  .modal-content {
+    width: 90%; /* More width for smaller screens */
+  }
+}
+
+/* Tabs and Tab content styles */
+.tabs {
+  overflow: hidden; /* Hides the overflowing content */
+  background: #f44336; /* Red background for tabs */
+}
+
+/* Default display for active tab content */
+.slider-container {
+  position: relative;
+}
+
+#prevButton, #nextButton {
+  cursor: pointer;
+}
+
+#prevButton img, #nextButton img {
+  width: 50px; /* Adjust as needed */
+}
+
+#articleSlider .slide {
+  display: none; /* Hide all slides by default */
+  width: 100%; /* Each slide should be full width */
+}
+/* Slider container styles */
+.slider-container {
+  position: relative;
+  background-color: #2a2a2a; /* dark gray background */
+  color: white;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  overflow: hidden; /* Hide horizontal scrollbar */
+}
+
+/* Slider styles */
+#articleSlider {
+  display: flex;
+  gap: 1rem; /* Adjust this as needed */
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Slide styles */
+.slide {
+  flex: 0 0 auto;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Content container inside slide */
+.container {
+  max-width: 1280px; /* or any other max-width */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+
+
+
+/* Button styles */
+.read-more-button {
+  background-color: #e53e3e; /* red-600 */
+  color: white;
+  padding: 5rem 4rem;
+  border-radius: 0.25rem;
+  text-decoration: none; /* Remove underline */
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.read-more-button:hover {
+  background-color: #c53030; /* red-700 */
+}
+
+/* Arrow button styles */
+.arrow-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#prevButton {
+  left: 1rem;
+}
+
+#nextButton {
+  right: 1rem;
+}
+
+/* Image styles */
+.image {
+  width: 100%;
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.image:hover {
+  transform: scale(1.05);
+}
+.article-content {
+  width: 467px;
+  height: 225px;
+  padding: 1rem; /* Adjust the padding as needed */
+  background: rgba(0, 0, 0, 0.75); /* Semi-transparent background */
+  border-radius: 0.5rem; /* Rounded corners for the content box */
+  margin: 0.5rem; /* Add some margin around the content box */
+  color: white; /* Text color */
+  overflow: hidden; /* Hide the overflow */
+}
+
+/* Multi-line overflow with ellipsis for the subtitle */
+.subtitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Show a maximum of 3 lines */
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Add some responsive design */
+
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Article container */
+.article-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  max-width: 800px;
+}
+
+/* Article header */
+.article-header h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.article-header img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+/* Article content */
+.article-content {
+  margin-top: 20px;
+}
+
+.article-text {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Video player */
+.article-video video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Adjustments for larger screens */
+@media (min-width: 1024px) {
+  .article-container {
+    padding: 40px;
+  }
+
+  .article-content {
+      display: block; /* Changed from flex to block for a top-to-bottom layout */
+    }
+    
+    .article-text {
+      margin-bottom: 20px;
+    }
+    
+    /* Video player */
+    .article-video {
+      text-align: center;
+      width: 100%; /* Full width to center the video within the article */
+      padding-top: 20px; /* Add some space between the text and the video */
+      height: 420px;
+    }
+    
+    .article-video iframe {
+      width: 100%; /* Make it responsive */
+      max-width: 720px; /* Adjust based on preference */
+      height: auto; /* Maintain aspect ratio */
+      border-radius: 8px;
+      margin: 0 auto;
+      height: 350px; /* Center the video */
+    }
+    
+
+
+
+}

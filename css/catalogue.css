@@ -1,0 +1,126 @@
+/* Base styling for the overall page and banner section */
+/* Base resets and font */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a1a; /* Dark background */
+    color: #8e8e8e; /* White text for contrast */
+}
+
+/* Header styles with background image */
+.banner {
+    background: url('path-to-background-image.jpg') no-repeat center center/cover;
+    padding: 2rem 0; /* Space above and below the title */
+    text-align: center; /* Center align the title */
+    position: relative; /* For positioning the overlay */
+}
+
+.banner:before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay for text contrast */
+    z-index: 1;
+    padding: 40px;
+}
+
+/* Ensuring content is above the overlay */
+.banner h1 {
+    position: relative;
+    z-index: 2;
+    color: #E10600; /* Red color for emphasis */
+    font-size: 2.5rem;
+    margin-bottom: 2rem; /* Space below the title */
+}
+
+/* Style enhancements for dropdowns and buttons */
+select, button {
+    background-color: #000;
+    color: #fff; /* Red text */
+    border: 2px solid #fff;
+    padding: 10px 20px;
+    margin: 5px 0; /* Space between the dropdowns and button */
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    position: relative; /* For z-index positioning */
+    z-index: 2; /* Ensure dropdowns and button are above overlay */
+}
+
+select:hover, button:hover {
+    background-color: #fff;
+    color: #000;
+    box-shadow: 0 0 10px #E10600;
+}
+
+/* Styling for the filter container */
+.filter-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: relative; /* For z-index positioning */
+    z-index: 2; /* Ensure it's above the overlay */
+    padding: 0 1rem; /* Padding on the sides */
+}
+
+/* Grid container for car cards */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Styling for individual car cards */
+.car-card {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.car-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(224, 6, 0, 0.5);
+}
+
+/* Styling for car images inside the car cards */
+.car-image {
+    display: block;
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+/* Tooltips displayed on hover */
+.car-details {
+    display: none;
+    position: absolute;
+    background-color: #000;
+    color: #E10600;
+    border: 1px solid #E10600;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(224, 6, 0, 0.5);
+    border-radius: 5px;
+    width: auto;
+    max-width: 300px;
+}
+
+.car-details.show {
+    display: block;
+}
+
+/* Paragraphs inside tooltips for better formatting */
+.car-details p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}

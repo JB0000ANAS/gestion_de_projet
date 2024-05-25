@@ -1,12 +1,12 @@
 <?php
-
+// Include the database connection file
 require 'db.php';
 
-
+// Fetch data from the SQL table
 $query = "SELECT * FROM co2_emissions_car__1_";
 $result = $conn->query($query);
 
-// data to JSON
+// Convert the data to JSON format
 $data = [];
 while ($row = $result->fetch_assoc()) {
     $data[] = $row;
@@ -29,13 +29,13 @@ $jsonData = json_encode($data);
     <div class="container">
         <h1>CO2 Emissions Analysis</h1>
 
-   
+        <!-- Scatter Matrix Plot -->
         <div id="scatter-matrix-plot"></div>
 
-       
+        <!-- Heatmap Plot -->
         <div id="heatmap-plot"></div>
 
-    
+        <!-- Car Selection Dropdowns -->
         <div id="car-selection-widget">
             <label for="make-dropdown">Make:</label>
             <select id="make-dropdown"></select>
@@ -43,7 +43,7 @@ $jsonData = json_encode($data);
             <select id="model-dropdown"></select>
         </div>
 
-       
+        <!-- Prediction Widgets -->
         <div id="prediction-widget">
             <label for="engine-size-widget">Engine Size (L):</label>
             <input type="number" id="engine-size-widget" min="1.0" max="6.0" step="0.1" value="2.0">
@@ -60,16 +60,18 @@ $jsonData = json_encode($data);
     </div>
 
     <script>
-
+        // Get the JSON data from PHP
         const data = <?php echo $jsonData; ?>;
 
-    
+        // Data preparation
         const X = data.map(d => [parseFloat(d['Engine Size(L)']), parseInt(d['Cylinders']), parseFloat(d['Fuel Consumption Comb (L/100 km)'])]);
         const y = data.map(d => parseFloat(d['CO2 Emissions(g/km)']));
 
+        // Train the Random Forest Regressor model
         const model = new RandomForestRegressor(100, 42);
         model.fit(X, y);
 
+        // Function to update plots based on selected make and model
         function updatePlots(make, model) {
             const filteredData = data.filter(d => d['Make'] === make && d['Model'] === model);
             const numericData = filteredData.map(d => ({
@@ -79,6 +81,7 @@ $jsonData = json_encode($data);
                 'CO2 Emissions(g/km)': parseFloat(d['CO2 Emissions(g/km)'])
             }));
 
+            // Create scatter matrix plot using Plotly
             const scatterData = Object.keys(numericData[0]).map(key => ({
                 x: numericData.map(d => d[key]),
                 y: numericData.map(d => d['CO2 Emissions(g/km)']),
@@ -92,7 +95,7 @@ $jsonData = json_encode($data);
 
             Plotly.newPlot('scatter-matrix-plot', scatterData, scatterLayout);
 
-          
+            // Create heatmap plot using Plotly
             const correlationMatrix = calculateCorrelationMatrix(numericData);
 
             const heatmapData = [{
@@ -110,14 +113,14 @@ $jsonData = json_encode($data);
             Plotly.newPlot('heatmap-plot', heatmapData, heatmapLayout);
         }
 
-
+        // Function to handle car selection dropdown changes
         function handleCarSelection() {
             const make = makeDropdown.value;
             const model = modelDropdown.value;
             updatePlots(make, model);
         }
 
-
+        // Function to calculate the correlation matrix
         function calculateCorrelationMatrix(data) {
             const features = Object.keys(data[0]);
             const correlationMatrix = [];
@@ -136,7 +139,7 @@ $jsonData = json_encode($data);
             return correlationMatrix;
         }
 
-
+        // Function to calculate the correlation coefficient
         function calculateCorrelation(x, y) {
             const n = x.length;
             const sumX = x.reduce((sum, value) => sum + value, 0);
@@ -151,7 +154,7 @@ $jsonData = json_encode($data);
             return numerator / denominator;
         }
 
-      
+        // Function to calculate the environmental score based on CO2 emissions
         function calculateScore(emissions) {
             if (emissions <= 100) {
                 return 100;
@@ -168,7 +171,7 @@ $jsonData = json_encode($data);
             }
         }
 
-      
+        // Function to perform prediction and display score
         function performPrediction() {
             const engineSize = parseFloat(engineSizeWidget.value);
             const cylinders = parseInt(cylindersWidget.value);
@@ -184,7 +187,7 @@ $jsonData = json_encode($data);
             `;
         }
 
-        
+        // Initialize the widgets and attach event listeners
         const makeDropdown = document.getElementById('make-dropdown');
         const modelDropdown = document.getElementById('model-dropdown');
         const engineSizeWidget = document.getElementById('engine-size-widget');
@@ -192,7 +195,7 @@ $jsonData = json_encode($data);
         const fuelConsumptionWidget = document.getElementById('fuel-consumption-widget');
         const predictButton = document.getElementById('predict-button');
 
-    
+        // Populate make dropdown
         const makeOptions = [...new Set(data.map(d => d['Make']))];
         makeOptions.forEach(make => {
             const option = document.createElement('option');
@@ -201,7 +204,7 @@ $jsonData = json_encode($data);
             makeDropdown.appendChild(option);
         });
 
-      
+        // Update model dropdown based on selected make
         makeDropdown.addEventListener('change', () => {
             const selectedMake = makeDropdown.value;
             const modelOptions = data.filter(d => d['Make'] === selectedMake).map(d => d['Model']);
@@ -217,8 +220,9 @@ $jsonData = json_encode($data);
 
         predictButton.addEventListener('click', performPrediction);
 
-        
+        // Initial plot rendering
         handleCarSelection();
     </script>
 </body>
 </html>
+

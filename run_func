@@ -1,16 +1,28 @@
 <?php
-// Include the database connection file
-require 'db.php';
+// Database connection details
+$host = 'localhost';
+$dbname = 'voiture';
+$user = 'root';
+$pass = '';
+
+// Create a new PDO instance
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 
 // Fetch data from the SQL table
-$query = "SELECT * FROM co2_emissions_car__1_";
-$result = $conn->query($query);
+try {
+    $query = "SELECT * FROM co2_emissions_car__1_";
+    $stmt = $pdo->query($query);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Data fetching failed: " . $e->getMessage());
+}
 
 // Convert the data to JSON format
-$data = [];
-while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
-}
 $jsonData = json_encode($data);
 ?>
 
@@ -20,7 +32,6 @@ $jsonData = json_encode($data);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CO2 Emissions Analysis</title>
-    <!-- Include necessary CSS and JavaScript libraries -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
@@ -29,51 +40,88 @@ $jsonData = json_encode($data);
     <div class="container">
         <h1>CO2 Emissions Analysis</h1>
 
-        <!-- Scatter Matrix Plot -->
-        <div id="scatter-matrix-plot"></div>
+        <!-- Car Selection Form -->
+        <form id="car-selection-form">
+            <div class="mb-3">
+                <label for="make-select" class="form-label">Select Make:</label>
+                <select id="make-select" class="form-select" required>
+                    <option value="">Choose...</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="model-select" class="form-label">Select Model:</label>
+                <select id="model-select" class="form-select" required>
+                    <option value="">Choose...</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Show Plots</button>
+        </form>
+
+        <!-- Bubble Chart -->
+        <div id="bubble-chart"></div>
 
         <!-- Heatmap Plot -->
         <div id="heatmap-plot"></div>
-
-        <!-- Car Selection Dropdowns -->
-        <div id="car-selection-widget">
-            <label for="make-dropdown">Make:</label>
-            <select id="make-dropdown"></select>
-            <label for="model-dropdown">Model:</label>
-            <select id="model-dropdown"></select>
-        </div>
-
-        <!-- Prediction Widgets -->
-        <div id="prediction-widget">
-            <label for="engine-size-widget">Engine Size (L):</label>
-            <input type="number" id="engine-size-widget" min="1.0" max="6.0" step="0.1" value="2.0">
-
-            <label for="cylinders-widget">Cylinders:</label>
-            <input type="number" id="cylinders-widget" min="1" max="12" step="1" value="4">
-
-            <label for="fuel-consumption-widget">Fuel Consumption Comb (L/100 km):</label>
-            <input type="number" id="fuel-consumption-widget" min="3.0" max="20.0" step="0.1" value="7.0">
-
-            <button id="predict-button">Predict Score</button>
-            <div id="prediction-output"></div>
-        </div>
     </div>
 
     <script>
         // Get the JSON data from PHP
         const data = <?php echo $jsonData; ?>;
 
-        // Data preparation
-        const X = data.map(d => [parseFloat(d['Engine Size(L)']), parseInt(d['Cylinders']), parseFloat(d['Fuel Consumption Comb (L/100 km)'])]);
-        const y = data.map(d => parseFloat(d['CO2 Emissions(g/km)']));
-
-        // Train the Random Forest Regressor model
-        const model = new RandomForestRegressor(100, 42);
-        model.fit(X, y);
-
         // Function to update plots based on selected make and model
         function updatePlots(make, model) {
-            const filteredData = data.filter(d => d['Make'] === make && d['Model'] === model);
+            let filteredData;
+            if (make && model) {
+                filteredData = data.filter(d => d['Make'] === make && d['Model'] === model);
+            } else {
+                filteredData = data;
+            }
+
+            const bubbleData = filteredData.map(d => ({
+                x: parseFloat(d['Fuel Consumption Comb (L/100 km)']),
+                y: parseFloat(d['Engine Size(L)']),
+                r: parseFloat(d['CO2 Emissions(g/km)']) / 10, // Adjust the size of the bubbles
+                co2: parseFloat(d['CO2 Emissions(g/km)']),
+                Make: d['Make'],
+                Model: d['Model']
+            }));
+
+            // Create bubble chart using Plotly
+            const bubbleTrace = {
+                x: bubbleData.map(d => d.x),
+                y: bubbleData.map(d => d.y),
+                text: bubbleData.map(d => `${d.Make} ${d.Model}`),
+                mode: 'markers',
+                marker: {
+                    size: bubbleData.map(d => d.r),
+                    sizemode: 'area',
+                    sizeref: 2.0 * Math.max(...bubbleData.map(d => d.r)) / (60 ** 2), // Adjust the sizeref for better visibility
+                    color: bubbleData.map(d => d.co2), // Color the bubbles based on CO2 emissions
+                    colorscale: 'RdYlGn', // Choose a color scale (red for high emissions, green for low emissions)
+                    reversescale: true,
+                    colorbar: {
+                        title: 'CO2 Emissions<br>(g/km)',
+                        len: 0.8,
+                        thickness: 20,
+                        x: 1,
+                        xanchor: 'right',
+                        outlinewidth: 1
+                    }
+                },
+                hovertemplate: '%{text}<br>Fuel Consumption: %{x} L/100km<br>Engine Size: %{y} L<br>CO2 Emissions: %{marker.color} g/km'
+            };
+
+            const bubbleLayout = {
+                title: make && model ? `Fuel Consumption vs Engine Size (Bubble Color: CO2 Emissions) for ${make} ${model}` : 'Fuel Consumption vs Engine Size (Bubble Color: CO2 Emissions) for All Cars',
+                xaxis: { title: 'Fuel Consumption (L/100km)' },
+                yaxis: { title: 'Engine Size (L)' },
+                showlegend: false,
+                height: 600
+            };
+
+            Plotly.newPlot('bubble-chart', [bubbleTrace], bubbleLayout);
+
+            // Create heatmap plot using Plotly
             const numericData = filteredData.map(d => ({
                 'Engine Size(L)': parseFloat(d['Engine Size(L)']),
                 'Cylinders': parseInt(d['Cylinders']),
@@ -81,21 +129,6 @@ $jsonData = json_encode($data);
                 'CO2 Emissions(g/km)': parseFloat(d['CO2 Emissions(g/km)'])
             }));
 
-            // Create scatter matrix plot using Plotly
-            const scatterData = Object.keys(numericData[0]).map(key => ({
-                x: numericData.map(d => d[key]),
-                y: numericData.map(d => d['CO2 Emissions(g/km)']),
-                mode: 'markers',
-                name: key
-            }));
-
-            const scatterLayout = {
-                title: `Scatter Matrix for ${make} ${model}`,
-            };
-
-            Plotly.newPlot('scatter-matrix-plot', scatterData, scatterLayout);
-
-            // Create heatmap plot using Plotly
             const correlationMatrix = calculateCorrelationMatrix(numericData);
 
             const heatmapData = [{
@@ -107,17 +140,10 @@ $jsonData = json_encode($data);
             }];
 
             const heatmapLayout = {
-                title: `Heatmap of Feature Correlations for ${make} ${model}`,
+                title: make && model ? `Heatmap of Feature Correlations for ${make} ${model}` : 'Heatmap of Feature Correlations for All Cars',
             };
 
             Plotly.newPlot('heatmap-plot', heatmapData, heatmapLayout);
-        }
-
-        // Function to handle car selection dropdown changes
-        function handleCarSelection() {
-            const make = makeDropdown.value;
-            const model = modelDropdown.value;
-            updatePlots(make, model);
         }
 
         // Function to calculate the correlation matrix
@@ -154,75 +180,43 @@ $jsonData = json_encode($data);
             return numerator / denominator;
         }
 
-        // Function to calculate the environmental score based on CO2 emissions
-        function calculateScore(emissions) {
-            if (emissions <= 100) {
-                return 100;
-            } else if (emissions <= 150) {
-                return 90;
-            } else if (emissions <= 200) {
-                return 80;
-            } else if (emissions <= 250) {
-                return 70;
-            } else if (emissions <= 300) {
-                return 60;
-            } else {
-                return 50;
-            }
-        }
-
-        // Function to perform prediction and display score
-        function performPrediction() {
-            const engineSize = parseFloat(engineSizeWidget.value);
-            const cylinders = parseInt(cylindersWidget.value);
-            const fuelConsumption = parseFloat(fuelConsumptionWidget.value);
-
-            const predictedEmissions = model.predict([[engineSize, cylinders, fuelConsumption]])[0];
-            const score = calculateScore(predictedEmissions);
-
-            const outputElement = document.getElementById('prediction-output');
-            outputElement.innerHTML = `
-                <p>Predicted CO2 Emissions: ${predictedEmissions.toFixed(2)} g/km</p>
-                <p>Predicted Environmental Score: ${score}</p>
-            `;
-        }
-
-        // Initialize the widgets and attach event listeners
-        const makeDropdown = document.getElementById('make-dropdown');
-        const modelDropdown = document.getElementById('model-dropdown');
-        const engineSizeWidget = document.getElementById('engine-size-widget');
-        const cylindersWidget = document.getElementById('cylinders-widget');
-        const fuelConsumptionWidget = document.getElementById('fuel-consumption-widget');
-        const predictButton = document.getElementById('predict-button');
-
-        // Populate make dropdown
-        const makeOptions = [...new Set(data.map(d => d['Make']))];
-        makeOptions.forEach(make => {
+        // Populate make select options
+        const makeSelect = document.getElementById('make-select');
+        const uniqueMakes = [...new Set(data.map(d => d['Make']))];
+        uniqueMakes.forEach(make => {
             const option = document.createElement('option');
             option.value = make;
-            option.text = make;
-            makeDropdown.appendChild(option);
+            option.textContent = make;
+            makeSelect.appendChild(option);
         });
 
-        // Update model dropdown based on selected make
-        makeDropdown.addEventListener('change', () => {
-            const selectedMake = makeDropdown.value;
-            const modelOptions = data.filter(d => d['Make'] === selectedMake).map(d => d['Model']);
-            modelDropdown.innerHTML = '';
-            modelOptions.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.text = model;
-                modelDropdown.appendChild(option);
-            });
-            handleCarSelection();
+        // Populate model select options based on selected make
+        const modelSelect = document.getElementById('model-select');
+        makeSelect.addEventListener('change', () => {
+            const selectedMake = makeSelect.value;
+            modelSelect.innerHTML = '<option value="">Choose...</option>';
+            if (selectedMake) {
+                const models = data.filter(d => d['Make'] === selectedMake).map(d => d['Model']);
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+            }
         });
 
-        predictButton.addEventListener('click', performPrediction);
+        // Handle form submission
+        const form = document.getElementById('car-selection-form');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const selectedMake = makeSelect.value;
+            const selectedModel = modelSelect.value;
+            updatePlots(selectedMake, selectedModel);
+        });
 
-        // Initial plot rendering
-        handleCarSelection();
+        // Initial plot rendering for all cars
+        updatePlots();
     </script>
 </body>
 </html>
-

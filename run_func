@@ -1,78 +1,239 @@
 <?php
-// Database connection details
 $host = 'localhost';
 $dbname = 'voiture';
 $user = 'root';
 $pass = '';
 
-// Create a new PDO instance
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    die("Connexion à la base de données échouée : " . $e->getMessage());
 }
 
-// Fetch data from the SQL table
 try {
-    $query = "SELECT * FROM co2_emissions_car__1_";
+    $query = "SELECT DISTINCT `Make`, `Model`, `Vehicle Class`, `Engine Size(L)`, `Cylinders`, `Transmission`, `Fuel Type`, `Fuel Consumption City (L/100 km)`, `Fuel Consumption Hwy (L/100 km)`, `Fuel Consumption Comb (L/100 km)`, `Fuel Consumption Comb (mpg)`, `CO2 Emissions(g/km)` FROM co2_emissions_car__1_";
     $stmt = $pdo->query($query);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Data fetching failed: " . $e->getMessage());
+    die("Échec de la récupération des données : " . $e->getMessage());
 }
 
-// Convert the data to JSON format
 $jsonData = json_encode($data);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CO2 Emissions Analysis</title>
+    <title>Analyse des Émissions de CO2</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <style>body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.col {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.graph-container {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.graph-container h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.graph-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #494f54;
+}
+
+@media screen and (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+    
+    .col {
+        margin-bottom: 30px;
+    }
+}</style>
+    
 </head>
 <body>
     <div class="container">
-        <h1>CO2 Emissions Analysis</h1>
-
-        <!-- Car Selection Form -->
-        <form id="car-selection-form">
-            <div class="mb-3">
-                <label for="make-select" class="form-label">Select Make:</label>
-                <select id="make-select" class="form-select" required>
-                    <option value="">Choose...</option>
-                </select>
+        <h1 class="text-center my-4">Analyse des Émissions de CO2</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="plot-container">
+                    <h3>Graphique en Bulles</h3>
+                    <form id="bubble-chart-form">
+                        <div class="mb-3">
+                            <label for="make-select" class="form-label">Sélectionner la Marque :</label>
+                            <select id="make-select" class="form-select" required>
+                                <option value="">Choisir...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="model-select" class="form-label">Sélectionner le Modèle :</label>
+                            <select id="model-select" class="form-select">
+                                <option value="">Tous les Modèles</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Afficher le Graphique</button>
+                    </form>
+                    <div id="bubble-chart"></div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="model-select" class="form-label">Select Model:</label>
-                <select id="model-select" class="form-select" required>
-                    <option value="">Choose...</option>
-                </select>
+
+            <div class="col-md-6">
+                <div class="plot-container">
+                    <h3>Matrice de Corrélation</h3>
+                    <div id="heatmap-plot"></div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Show Plots</button>
-        </form>
+        </div>
 
-        <!-- Bubble Chart -->
-        <div id="bubble-chart"></div>
-
-        <!-- Heatmap Plot -->
-        <div id="heatmap-plot"></div>
+        <div class="plot-container">
+            <h3>Graphique de Dispersion 3D</h3>
+            <form id="scatter-plot-form">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="scatter-make-select" class="form-label">Sélectionner la Marque :</label>
+                            <select id="scatter-make-select" class="form-select" required>
+                                <option value="">Choisir...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="x-axis-select" class="form-label">Sélectionner l'Axe X :</label>
+                            <select id="x-axis-select" class="form-select" required>
+                                <option value="Engine Size(L)">Taille du Moteur (L)</option>
+                                <option value="Cylinders">Cylindres</option>
+                                <option value="Fuel Consumption Comb (L/100 km)">Consommation de Carburant (L/100 km)</option>
+                                <option value="Fuel Consumption City (L/100 km)">Consommation en Ville (L/100 km)</option>
+                                <option value="Fuel Consumption Hwy (L/100 km)">Consommation sur Autoroute (L/100 km)</option>
+                                <option value="Fuel Consumption Comb (mpg)">Consommation de Carburant (mpg)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="y-axis-select" class="form-label">Sélectionner l'Axe Y :</label>
+                            <select id="y-axis-select" class="form-select" required>
+                                <option value="Fuel Consumption Comb (L/100 km)">Consommation de Carburant (L/100 km)</option>
+                                <option value="Engine Size(L)">Taille du Moteur (L)</option>
+                                <option value="Cylinders">Cylindres</option>
+                                <option value="Fuel Consumption City (L/100 km)">Consommation en Ville (L/100 km)</option>
+                                <option value="Fuel Consumption Hwy (L/100 km)">Consommation sur Autoroute (L/100 km)</option>
+                                <option value="Fuel Consumption Comb (mpg)">Consommation de Carburant (mpg)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Mettre à Jour le Graphique 3D</button>
+                    <button type="button" id="show-all-button" class="btn btn-secondary">Afficher Tous les Modèles</button>
+                </div>
+            </form>
+            <div id="3d-scatter-plot"></div>
+        </div>
     </div>
 
     <script>
-        // Get the JSON data from PHP
         const data = <?php echo $jsonData; ?>;
 
-        // Function to update plots based on selected make and model
-        function updatePlots(make, model) {
+        function updateBubblePlot(make, model) {
             let filteredData;
             if (make && model) {
                 filteredData = data.filter(d => d['Make'] === make && d['Model'] === model);
+            } else if (make) {
+                filteredData = data.filter(d => d['Make'] === make);
             } else {
                 filteredData = data;
             }
@@ -80,13 +241,12 @@ $jsonData = json_encode($data);
             const bubbleData = filteredData.map(d => ({
                 x: parseFloat(d['Fuel Consumption Comb (L/100 km)']),
                 y: parseFloat(d['Engine Size(L)']),
-                r: parseFloat(d['CO2 Emissions(g/km)']) / 10, // Adjust the size of the bubbles
+                r: parseFloat(d['CO2 Emissions(g/km)']) / 20,
                 co2: parseFloat(d['CO2 Emissions(g/km)']),
                 Make: d['Make'],
                 Model: d['Model']
             }));
 
-            // Create bubble chart using Plotly
             const bubbleTrace = {
                 x: bubbleData.map(d => d.x),
                 y: bubbleData.map(d => d.y),
@@ -95,58 +255,46 @@ $jsonData = json_encode($data);
                 marker: {
                     size: bubbleData.map(d => d.r),
                     sizemode: 'area',
-                    sizeref: 2.0 * Math.max(...bubbleData.map(d => d.r)) / (60 ** 2), // Adjust the sizeref for better visibility
-                    color: bubbleData.map(d => d.co2), // Color the bubbles based on CO2 emissions
-                    colorscale: 'RdYlGn', // Choose a color scale (red for high emissions, green for low emissions)
-                    reversescale: true,
+                    sizeref: 2.0 * Math.max(...bubbleData.map(d => d.r)) / (40 ** 2),
+                    color: bubbleData.map(d => d.co2),
+                    colorscale: [
+                        [0, 'green'],
+                        [0.5, 'yellow'],
+                        [1, 'red']
+                    ],
+                    showscale: true,
                     colorbar: {
-                        title: 'CO2 Emissions<br>(g/km)',
+                        title: 'Émissions de CO2<br>(g/km)',
+                        titleside: 'top',
                         len: 0.8,
                         thickness: 20,
-                        x: 1,
+                        x: 1.2,
                         xanchor: 'right',
                         outlinewidth: 1
                     }
                 },
-                hovertemplate: '%{text}<br>Fuel Consumption: %{x} L/100km<br>Engine Size: %{y} L<br>CO2 Emissions: %{marker.color} g/km'
+                hovertemplate: '%{text}<br>Consommation de Carburant : %{x} L/100km<br>Taille du Moteur : %{y} L<br>Émissions de CO2 : %{marker.color} g/km'
             };
 
             const bubbleLayout = {
-                title: make && model ? `Fuel Consumption vs Engine Size (Bubble Color: CO2 Emissions) for ${make} ${model}` : 'Fuel Consumption vs Engine Size (Bubble Color: CO2 Emissions) for All Cars',
-                xaxis: { title: 'Fuel Consumption (L/100km)' },
-                yaxis: { title: 'Engine Size (L)' },
+                title: make ? `Consommation de Carburant vs Taille du Moteur (Couleur des Bulles : Émissions de CO2) pour ${make}` : 'Consommation de Carburant vs Taille du Moteur (Couleur des Bulles : Émissions de CO2) pour Toutes les Voitures',
+                xaxis: { title: 'Consommation de Carburant (L/100km)' },
+                yaxis: { title: 'Taille du Moteur (L)' },
                 showlegend: false,
-                height: 600
+                height: 600,
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 14,
+                    color: '#333'
+                },
+                margin: { l: 60, r: 120, t: 60, b: 60 }
             };
 
             Plotly.newPlot('bubble-chart', [bubbleTrace], bubbleLayout);
-
-            // Create heatmap plot using Plotly
-            const numericData = filteredData.map(d => ({
-                'Engine Size(L)': parseFloat(d['Engine Size(L)']),
-                'Cylinders': parseInt(d['Cylinders']),
-                'Fuel Consumption Comb (L/100 km)': parseFloat(d['Fuel Consumption Comb (L/100 km)']),
-                'CO2 Emissions(g/km)': parseFloat(d['CO2 Emissions(g/km)'])
-            }));
-
-            const correlationMatrix = calculateCorrelationMatrix(numericData);
-
-            const heatmapData = [{
-                z: correlationMatrix,
-                x: Object.keys(numericData[0]),
-                y: Object.keys(numericData[0]),
-                type: 'heatmap',
-                hoverongaps: false
-            }];
-
-            const heatmapLayout = {
-                title: make && model ? `Heatmap of Feature Correlations for ${make} ${model}` : 'Heatmap of Feature Correlations for All Cars',
-            };
-
-            Plotly.newPlot('heatmap-plot', heatmapData, heatmapLayout);
         }
 
-        // Function to calculate the correlation matrix
         function calculateCorrelationMatrix(data) {
             const features = Object.keys(data[0]);
             const correlationMatrix = [];
@@ -165,7 +313,6 @@ $jsonData = json_encode($data);
             return correlationMatrix;
         }
 
-        // Function to calculate the correlation coefficient
         function calculateCorrelation(x, y) {
             const n = x.length;
             const sumX = x.reduce((sum, value) => sum + value, 0);
@@ -180,7 +327,71 @@ $jsonData = json_encode($data);
             return numerator / denominator;
         }
 
-        // Populate make select options
+        function update3DScatterPlot(make, xAxis, yAxis, showAll = false) {
+            let filteredData;
+            if (showAll) {
+                filteredData = data;
+            } else {
+                filteredData = data.filter(d => d['Make'] === make);
+            }
+
+            const scatterData = filteredData.map(d => ({
+                x: parseFloat(d[xAxis]),
+                y: parseFloat(d[yAxis]),
+                z: parseFloat(d['CO2 Emissions(g/km)']),
+                text: d['Model'],
+                marker: {
+                    size: 5,
+                    color: parseFloat(d['CO2 Emissions(g/km)']),
+                    colorscale: 'Viridis'
+                }
+            }));
+
+            const trace = {
+                x: scatterData.map(d => d.x),
+                y: scatterData.map(d => d.y),
+                z: scatterData.map(d => d.z),
+                text: scatterData.map(d => d.text),
+                mode: 'markers',
+                type: 'scatter3d',
+                marker: {
+                    size: 5,
+                    color: scatterData.map(d => d.marker.color),
+                    colorscale: 'Viridis',
+                    colorbar: {
+                        title: 'Émissions de CO2<br>(g/km)',
+                        titleside: 'top',
+                        len: 0.8,
+                        thickness: 20,
+                        x: 1.2,
+                        xanchor: 'right',
+                        outlinewidth: 1
+                    }
+                },
+                hovertemplate: '%{text}<br>Émissions de CO2 : %{z} g/km<extra></extra>'
+            };
+
+            const layout = {
+                title: showAll ? 'Émissions de CO2 pour Tous les Modèles' : `Émissions de CO2 par ${xAxis} et ${yAxis} pour ${make}`,
+                scene: {
+                    xaxis: { title: xAxis },
+                    yaxis: { title: yAxis },
+                    zaxis: { title: 'Émissions de CO2 (g/km)' }
+                },
+                autosize: false,
+                width: 960,
+                height: 720,
+                margin: {
+                    l: 65,
+                    r: 50,
+                    b: 65,
+                    t: 90
+                }
+            };
+
+            Plotly.newPlot('3d-scatter-plot', [trace], layout);
+        }
+
         const makeSelect = document.getElementById('make-select');
         const uniqueMakes = [...new Set(data.map(d => d['Make']))];
         uniqueMakes.forEach(make => {
@@ -190,11 +401,10 @@ $jsonData = json_encode($data);
             makeSelect.appendChild(option);
         });
 
-        // Populate model select options based on selected make
         const modelSelect = document.getElementById('model-select');
         makeSelect.addEventListener('change', () => {
             const selectedMake = makeSelect.value;
-            modelSelect.innerHTML = '<option value="">Choose...</option>';
+            modelSelect.innerHTML = '<option value="">Tous les Modèles</option>';
             if (selectedMake) {
                 const models = data.filter(d => d['Make'] === selectedMake).map(d => d['Model']);
                 models.forEach(model => {
@@ -206,17 +416,61 @@ $jsonData = json_encode($data);
             }
         });
 
-        // Handle form submission
-        const form = document.getElementById('car-selection-form');
-        form.addEventListener('submit', (event) => {
+        const bubbleChartForm = document.getElementById('bubble-chart-form');
+        bubbleChartForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const selectedMake = makeSelect.value;
             const selectedModel = modelSelect.value;
-            updatePlots(selectedMake, selectedModel);
+            updateBubblePlot(selectedMake, selectedModel);
         });
 
-        // Initial plot rendering for all cars
-        updatePlots();
+        const numericData = data.map(d => ({
+            'Engine Size(L)': parseFloat(d['Engine Size(L)']),
+            'Cylinders': parseInt(d['Cylinders']),
+            'Fuel Consumption Comb (L/100 km)': parseFloat(d['Fuel Consumption Comb (L/100 km)']),
+            'CO2 Emissions(g/km)': parseFloat(d['CO2 Emissions(g/km)'])
+        }));
+
+        const correlationMatrix = calculateCorrelationMatrix(numericData);
+
+        const heatmapData = [{
+            z: correlationMatrix,
+            x: Object.keys(numericData[0]),
+            y: Object.keys(numericData[0]),
+            type: 'heatmap',
+            hoverongaps: false
+        }];
+
+        const heatmapLayout = {
+            title: 'Heatmap des Corrélations de Caractéristiques pour Toutes les Voitures',
+            height: 600
+        };
+
+        Plotly.newPlot('heatmap-plot', heatmapData, heatmapLayout);
+
+        const scatterMakeSelect = document.getElementById('scatter-make-select');
+        uniqueMakes.forEach(make => {
+            const option = document.createElement('option');
+            option.value = make;
+            option.textContent = make;
+            scatterMakeSelect.appendChild(option);
+        });
+
+        const scatterPlotForm = document.getElementById('scatter-plot-form');
+        scatterPlotForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const selectedMake = scatterMakeSelect.value;
+            const selectedXAxis = document.getElementById('x-axis-select').value;
+            const selectedYAxis = document.getElementById('y-axis-select').value;
+            update3DScatterPlot(selectedMake, selectedXAxis, selectedYAxis);
+        });
+
+        const showAllButton = document.getElementById('show-all-button');
+        showAllButton.addEventListener('click', () => {
+            const selectedXAxis = document.getElementById('x-axis-select').value;
+            const selectedYAxis = document.getElementById('y-axis-select').value;
+            update3DScatterPlot(null, selectedXAxis, selectedYAxis, true);
+        });
     </script>
 </body>
 </html>

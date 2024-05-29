@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculateur de Performance et Consommation</title>
+</head>
+<body>
+    <h1>Calculateur de Performance et Consommation</h1>
+    <form id="calculatorForm">
+        <label for="vehicle_id">Sélectionnez un véhicule:</label>
+        <select name="vehicle_id" id="vehicle_id">
+            <!-- Les options des véhicules seront chargées dynamiquement -->
+        </select>
+        <button type="button" onclick="calculate()">Calculer</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/vehicules')
+                .then(response => response.json())
+                .then(data => {
+                    let vehicleSelect = document.getElementById('vehicle_id');
+                    data.forEach(vehicle => {
+                        let option = document.createElement('option');
+                        option.value = vehicle.id;
+                        option.text = `${vehicle.marque} ${vehicle.nom_modele}`;
+                        vehicleSelect.add(option);
+                    });
+                });
+        });
+
+        function calculate() {
+            const form = document.getElementById('calculatorForm');
+            const formData = new FormData(form);
+            const vehicleId = formData.get('vehicle_id');
+
+            fetch('/calculer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ vehicle_id: vehicleId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultsDiv = document.getElementById('results');
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <h2>Résultats</h2>
+                        <p>Performance: ${data.performance}</p>
+                        <p>Consommation: ${data.consumption} L/100 km</p>
+                    `;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

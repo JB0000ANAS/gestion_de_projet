@@ -19,6 +19,8 @@ $userGreeting = isset($_SESSION['user_nom']) ? "Bonjour " . htmlspecialchars($_S
         <ul class="md:flex space-x-4">
             <li><a href="catalogue.php" class="hover:text-red-600">Catalogue</a></li>
              <li><a href="comparaison.php" class="hover:text-red-600">Comparaison</a></li>
+             <li><a href="preferences.php" class="hover:text-red-600">Besoin d'aide?</a></li>
+
             <!-- Add more navigation items here -->
         </ul>
     </div>
